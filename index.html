@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Musaib — Notebook</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Marked.js for markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="window.katexReady = true;"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --cream:       #F5F0E8;
+      --cream-dark:  #EDE5D5;
+      --cream-mid:   #E8DFC8;
+      --parchment:   #D4C5A9;
+      --amber:       #C8883A;
+      --amber-light: #DBA85A;
+      --sienna:      #A0522D;
+      --rust:        #8B3A1A;
+      --walnut:      #3D2B1F;
+      --walnut-soft: #5C3D2E;
+      --sage:        #7A8C6E;
+      --sage-light:  #A3B899;
+      --fog:         #B8A898;
+      --ink:         #2C1F14;
+      --ink-soft:    #4A3728;
+      --gold:        #C8973A;
+      --gold-pale:   #E8C882;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Lora', Georgia, serif;
+      --font-mono:    'DM Mono', 'Courier New', monospace;
+
+      --sidebar-w:  260px;
+      --backlink-w: 300px;
+      --backlink-collapsed-w: 44px;
+      --topbar-h:   56px;
+      --radius:     4px;
+      --radius-lg:  10px;
+
+      --shadow-sm:  0 1px 3px rgba(44,31,20,0.08);
+      --shadow-md:  0 4px 16px rgba(44,31,20,0.12);
+      --shadow-lg:  0 8px 32px rgba(44,31,20,0.16);
+
+      --trans: 200ms ease;
+    }
+
+    /* ─── RESET ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.75;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── GRAIN OVERLAY ──────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 999;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    /* ─── TOPBAR ─────────────────────────────────────────────── */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--topbar-h);
+      background: rgba(245,240,232,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--cream-mid);
+      display: flex; align-items: center;
+      padding: 0 24px;
+      gap: 32px;
+    }
+
+    .site-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--walnut);
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+      font-style: italic;
+    }
+
+    .site-title span {
+      color: var(--amber);
+      font-style: normal;
+    }
+
+    nav {
+      display: flex; gap: 4px; margin-left: auto;
+    }
+
+    .nav-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      transition: background var(--trans), color var(--trans);
+    }
+
+    .nav-btn:hover { background: var(--cream-mid); color: var(--walnut); }
+    .nav-btn.active {
+      background: var(--walnut);
+      color: var(--cream);
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────── */
+    #app {
+      margin-top: var(--topbar-h);
+      min-height: calc(100vh - var(--topbar-h));
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ─── HOME TAB ───────────────────────────────────────────── */
+    #tab-home {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 72px 48px;
+      animation: fadeUp 300ms ease forwards;
+    }
+
+    .home-hero { margin-bottom: 56px; }
+    .home-title {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--walnut);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .home-title span {
+      color: var(--amber);
+      font-style: italic;
+    }
+    .home-tagline {
+      font-size: 1.15rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .home-stats {
+      display: flex; gap: 24px; margin-bottom: 56px;
+    }
+    .stat-card {
+      background: var(--cream-dark);
+      border: 1px solid var(--cream-mid);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      flex: 1;
+      text-align: center;
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      color: var(--amber);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--fog);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .home-section-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--walnut);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .home-section-title i { color: var(--amber); }
+
+    .recent-notes-list {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .recent-note-card {
+      background: var(--cream);
+      border: 1px solid var(--cream-mid);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all var(--trans);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .recent-note-card:hover {
+      border-color: var(--amber-light);
+      background: rgba(200,136,58,0.05);
+      transform: translateX(4px);
+    }
+    .recent-note-title {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--walnut);
+    }
+    .recent-note-meta {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--fog);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── NOTEBOOK TAB ───────────────────────────────────────── */
+    #tab-notebook {
+      display: none;
+      flex-direction: row;
+      min-height: calc(100vh - var(--topbar-h));
+    }
+    #tab-notebook.active { display: flex; }
+
+    /* Sidebar */
+    #sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--cream-dark);
+      border-right: 1px solid var(--cream-mid);
+      padding: 20px 0;
+      height: calc(100vh - var(--topbar-h));
+      position: sticky; top: var(--topbar-h);
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+
+    .sidebar-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fog);
+      padding: 16px 18px 6px;
+    }
+
+    /* Folders */
+    .folder-group { margin-bottom: 2px; }
+    .folder-header {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      padding: 8px 18px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background var(--trans), color var(--trans);
+      user-select: none;
+    }
+    .folder-header:hover { background: var(--cream-mid); color: var(--walnut); }
+    .folder-header .chevron {
+      width: 14px; height: 14px; transition: transform 200ms ease;
+    }
+    .folder-header.open .chevron { transform: rotate(90deg); }
+    .folder-notes { display: none; }
+    .folder-notes.open { display: block; }
+
+    .sidebar-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 7px 18px 7px 38px;
+      cursor: pointer;
+      transition: background var(--trans), color var(--trans);
+      border-left: 2px solid transparent;
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    .sidebar-item.root-item { padding-left: 18px; }
+
+    .sidebar-item:hover {
+      background: var(--cream-mid);
+      color: var(--walnut);
+      border-left-color: var(--parchment);
+    }
+    .sidebar-item.active {
+      background: rgba(200,136,58,0.1);
+      color: var(--amber);
+      border-left-color: var(--amber);
+      font-weight: 500;
+    }
+
+    .sidebar-item-icon {
+      margin-top: 2px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .sidebar-item-icon i { width: 14px; height: 14px; stroke-width: 2px; }
+
+    /* Main note area */
+    #note-main {
+      flex: 1;
+      padding: 48px 56px;
+      max-width: 780px;
+      min-width: 0;
+    }
+
+    /* Backlink panel */
+    #backlink-panel {
+      width: var(--backlink-w);
+      flex-shrink: 0;
+      background: var(--cream-dark);
+      border-left: 1px solid var(--cream-mid);
+      padding: 24px 20px;
+      height: calc(100vh - var(--topbar-h));
+      position: sticky; top: var(--topbar-h);
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: width var(--trans), padding var(--trans);
+    }
+
+    #backlink-panel.collapsed {
+      width: var(--backlink-collapsed-w);
+      padding: 24px 0;
+      cursor: pointer;
+    }
+    #backlink-panel.collapsed:hover {
+      background: var(--cream-mid);
+    }
+    #backlink-panel.collapsed .backlink-header span,
+    #backlink-panel.collapsed .backlink-header::before,
+    #backlink-panel.collapsed #backlink-list {
+      display: none;
+    }
+
+    .backlink-header {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fog);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: color var(--trans);
+    }
+    .backlink-header:hover { color: var(--walnut); }
+    .backlink-header .collapse-icon {
+      transition: transform 0.2s; width: 14px; height: 14px;
+    }
+    #backlink-panel.collapsed .backlink-header {
+      justify-content: center; margin-bottom: 0;
+    }
+    #backlink-panel.collapsed .backlink-header .collapse-icon {
+      transform: rotate(180deg);
+    }
+    .backlink-header::before {
+      content: '';
+      display: block; width: 20px; height: 1px;
+      background: var(--parchment);
+    }
+
+    .backlink-entry {
+      padding: 10px 12px;
+      border: 1px solid var(--cream-mid);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color var(--trans), background var(--trans);
+      background: var(--cream);
+    }
+    .backlink-entry:hover {
+      border-color: var(--amber-light);
+      background: rgba(200,136,58,0.05);
+    }
+    .backlink-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--walnut);
+      margin-bottom: 4px;
+    }
+    .backlink-excerpt {
+      font-size: 0.72rem;
+      color: var(--fog);
+      line-height: 1.5;
+      font-family: var(--font-mono);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .no-backlinks {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--parchment);
+      font-style: italic;
+    }
+
+    /* ─── NOTE CONTENT STYLES ────────────────────────────────── */
+    .note-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--fog);
+      letter-spacing: 0.05em;
+      margin-bottom: 32px;
+      display: flex; gap: 16px; align-items: center;
+    }
+
+    .note-meta-tags { display: flex; gap: 4px; }
+    .note-meta-tag {
+      background: var(--cream-mid);
+      color: var(--walnut-soft);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+    }
+
+    #note-content h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--walnut);
+      line-height: 1.2;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    #note-content h2 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--walnut);
+      margin: 36px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--cream-mid);
+      font-style: italic;
+    }
+    #note-content h3 {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--sienna);
+      margin: 24px 0 10px;
+      letter-spacing: 0.02em;
+    }
+    #note-content p {
+      margin-bottom: 16px;
+      color: var(--ink-soft);
+      font-size: 0.97rem;
+    }
+    #note-content ul, #note-content ol {
+      margin: 12px 0 16px 20px;
+      color: var(--ink-soft);
+    }
+    #note-content li { margin-bottom: 6px; font-size: 0.95rem; }
+
+    #note-content blockquote {
+      border-left: 3px solid var(--amber-light);
+      margin: 24px 0;
+      padding: 12px 20px;
+      background: rgba(200,136,58,0.06);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    #note-content blockquote p {
+      margin: 0;
+      font-style: italic;
+      color: var(--walnut-soft);
+      font-size: 1.05rem;
+    }
+
+    /* Callouts */
+    .callout {
+      margin: 24px 0; padding: 16px 20px; border-radius: var(--radius-lg);
+      border-left: 4px solid var(--amber); background: rgba(200,136,58,0.06);
+    }
+    .callout-title {
+      font-weight: 600; font-family: var(--font-display);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+      color: var(--walnut); font-size: 1.1rem; font-style: italic;
+    }
+    .callout-title i { width: 18px; height: 18px; }
+    .callout-content p:last-child { margin-bottom: 0; }
+    
+    .callout[data-callout="abstract"] { border-left-color: var(--amber); background: rgba(200,136,58,0.06); }
+    .callout[data-callout="abstract"] .callout-title { color: var(--amber); }
+    
+    .callout[data-callout="info"] { border-left-color: var(--amber); background: rgba(200,136,58,0.06); }
+    .callout[data-callout="info"] .callout-title { color: var(--amber); }
+    
+    .callout[data-callout="tip"] { border-left-color: var(--sage); background: rgba(122,140,110,0.06); }
+    .callout[data-callout="tip"] .callout-title { color: var(--sage); }
+    
+    .callout[data-callout="important"], .callout[data-callout="warning"] { border-left-color: var(--sienna); background: rgba(160,82,45,0.06); }
+    .callout[data-callout="important"] .callout-title, .callout[data-callout="warning"] .callout-title { color: var(--sienna); }
+    
+    .callout[data-callout="caution"] { border-left-color: var(--rust); background: rgba(139,58,26,0.06); }
+    .callout[data-callout="caution"] .callout-title { color: var(--rust); }
+
+    #note-content code {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--cream-mid);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--sienna);
+    }
+    #note-content pre {
+      background: var(--walnut);
+      color: var(--gold-pale);
+      padding: 20px 24px;
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    #note-content pre code { background: none; padding: 0; color: inherit; }
+    #note-content strong { color: var(--walnut); font-weight: 600; }
+    #note-content em { color: var(--walnut-soft); }
+    #note-content hr {
+      border: none; border-top: 1px solid var(--cream-mid); margin: 32px 0;
+    }
+
+    /* Wikilinks */
+    .wikilink {
+      color: var(--amber);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--amber-light);
+      transition: color var(--trans), border-color var(--trans), background var(--trans);
+      cursor: pointer;
+    }
+    .wikilink:hover {
+      color: var(--sienna);
+      border-color: var(--sienna);
+      background: rgba(200,136,58,0.1);
+    }
+    .wikilink.missing {
+      color: var(--fog);
+      border-color: var(--parchment);
+    }
+
+    /* ─── LINK PREVIEW POPOVER ───────────────────────────────── */
+    .link-preview-popover {
+      position: fixed; z-index: 1000; width: 340px; max-height: 240px;
+      background: var(--cream); border: 1px solid var(--parchment);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+      padding: 16px; pointer-events: none;
+      opacity: 0; transform: translateY(4px); transition: opacity 0.2s, transform 0.2s;
+    }
+    .link-preview-popover.show { opacity: 1; transform: translateY(0); }
+    .preview-title {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 600;
+      color: var(--walnut); margin-bottom: 8px; border-bottom: 1px solid var(--cream-mid); padding-bottom: 4px;
+    }
+    .preview-content {
+      font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* ─── RESOURCES TAB ──────────────────────────────────────── */
+    #tab-resources { max-width: 1000px; margin: 0 auto; padding: 56px 48px; }
+    .section-header {
+      font-family: var(--font-display); font-size: 2.5rem; font-weight: 700;
+      color: var(--walnut); margin-bottom: 8px; font-style: italic;
+    }
+    .section-sub {
+      font-family: var(--font-mono); font-size: 0.75rem; color: var(--fog);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 48px;
+    }
+    .resource-categories { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .cat-btn {
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 5px 14px; border-radius: 20px;
+      border: 1px solid var(--parchment); background: none; cursor: pointer;
+      color: var(--ink-soft); transition: all var(--trans);
+    }
+    .cat-btn:hover, .cat-btn.active { background: var(--walnut); color: var(--cream); border-color: var(--walnut); }
+    .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .resource-card {
+      background: var(--cream-dark); border: 1px solid var(--cream-mid);
+      border-radius: var(--radius-lg); padding: 20px 22px;
+      transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+      position: relative; overflow: hidden;
+    }
+    .resource-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--amber), var(--sienna));
+      transform: scaleX(0); transform-origin: left; transition: transform var(--trans);
+    }
+    .resource-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--parchment); }
+    .resource-card:hover::before { transform: scaleX(1); }
+    .resource-category-label {
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--amber); margin-bottom: 8px;
+    }
+    .resource-title { font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; color: var(--walnut); margin-bottom: 8px; line-height: 1.4; }
+    .resource-note { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.55; margin-bottom: 14px; }
+    .resource-link {
+      font-family: var(--font-mono); font-size: 0.65rem; color: var(--amber);
+      text-decoration: none; letter-spacing: 0.04em; transition: color var(--trans);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .resource-link:hover { color: var(--sienna); }
+    .resource-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+
+    /* ─── ABOUT TAB ──────────────────────────────────────────── */
+    #tab-about { max-width: 720px; margin: 0 auto; padding: 72px 48px; }
+    .about-eyebrow {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--amber); margin-bottom: 16px;
+    }
+    .about-name {
+      font-family: var(--font-display); font-size: 3.5rem; font-weight: 900;
+      color: var(--walnut); line-height: 1.05; margin-bottom: 32px; letter-spacing: -0.03em;
+    }
+    .about-name em { display: block; font-style: italic; color: var(--amber); font-size: 2.8rem; }
+    .about-body { font-size: 1.05rem; color: var(--ink-soft); line-height: 1.85; margin-bottom: 20px; }
+    .about-body strong { color: var(--walnut); }
+    .about-divider { width: 40px; height: 2px; background: linear-gradient(90deg, var(--amber), transparent); margin: 40px 0; }
+    .about-section-title {
+      font-family: var(--font-display); font-size: 1.2rem; font-style: italic;
+      color: var(--walnut); margin-bottom: 16px;
+    }
+    .interest-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 32px; }
+    .interest-list li {
+      font-size: 0.9rem; color: var(--ink-soft); padding: 8px 14px;
+      background: var(--cream-dark); border-radius: var(--radius);
+      border: 1px solid var(--cream-mid); display: flex; align-items: center; gap: 8px;
+    }
+    .interest-list li i { width: 18px; height: 18px; color: var(--amber); flex-shrink: 0; display: inline-block; }
+    .connect-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .connect-link {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--walnut); text-decoration: none; padding: 7px 16px;
+      border: 1px solid var(--parchment); border-radius: var(--radius);
+      transition: all var(--trans); background: var(--cream-dark);
+    }
+    .connect-link:hover { background: var(--walnut); color: var(--cream); border-color: var(--walnut); }
+
+    /* ─── SEARCH BAR ─────────────────────────────────────────── */
+    #search-wrap { padding: 16px 18px; border-bottom: 1px solid var(--cream-mid); }
+    #search-input {
+      width: 100%; background: var(--cream); border: 1px solid var(--cream-mid);
+      border-radius: var(--radius); padding: 6px 10px; font-family: var(--font-mono);
+      font-size: 0.75rem; color: var(--ink); outline: none; transition: border-color var(--trans);
+    }
+    #search-input:focus { border-color: var(--amber-light); }
+    #search-input::placeholder { color: var(--parchment); }
+
+    /* ─── EMPTY / WELCOME ────────────────────────────────────── */
+    #note-welcome {
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 60vh;
+    }
+    .welcome-leaf { width: 48px; height: 48px; margin-bottom: 24px; opacity: 0.6; color: var(--amber); }
+    .welcome-title {
+      font-family: var(--font-display); font-size: 2rem; color: var(--walnut); font-style: italic; margin-bottom: 12px;
+    }
+    .welcome-body {
+      font-family: var(--font-mono); font-size: 0.78rem; color: var(--fog); line-height: 1.7; max-width: 400px;
+    }
+
+    /* ─── MATH (KaTeX) ───────────────────────────────────────── */
+    .katex-display {
+      margin: 24px 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 16px 20px;
+      background: rgba(61,43,31,0.04);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--parchment);
+    }
+    .katex { font-size: 1.05em; }
+    .katex-display > .katex { font-size: 1.1em; }
+    /* prevent marked.js from mangling _ inside math */
+    .math-inline { display: inline; }
+    .math-block  { display: block;  }
+
+    /* ─── TABLES ─────────────────────────────────────────────── */
+    #note-content table {
+      width: 100%; border-collapse: collapse; margin: 24px 0;
+      font-size: 0.88rem;
+    }
+    #note-content th {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--walnut); background: var(--cream-mid);
+      padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--parchment);
+    }
+    #note-content td {
+      padding: 9px 14px; color: var(--ink-soft);
+      border-bottom: 1px solid var(--cream-mid);
+    }
+    #note-content tr:last-child td { border-bottom: none; }
+    #note-content tr:hover td { background: rgba(200,136,58,0.04); }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--fog); }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .note-enter { animation: fadeUp 280ms ease forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .resource-card { animation: slideIn 300ms ease backwards; }
+    .deco-line { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .deco-line::before, .deco-line::after {
+      content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--parchment), transparent);
+    }
+    .deco-line span { font-size: 0.8rem; color: var(--parchment); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      #backlink-panel { display: none; }
+      #tab-notebook { flex-direction: column; }
+      #sidebar {
+        width: 100%; height: auto; position: relative; top: 0;
+        border-right: none; border-bottom: 1px solid var(--cream-mid);
+        flex-direction: column; padding: 12px; gap: 4px;
+      }
+      .sidebar-label { padding: 4px 8px; }
+      .sidebar-item { padding: 6px 10px; }
+      #note-main { padding: 24px 20px; }
+      #tab-resources, #tab-home { padding: 32px 20px; }
+      #tab-about { padding: 40px 20px; }
+      .about-name { font-size: 2.5rem; }
+      .about-name em { font-size: 2rem; }
+      .interest-list, .home-grid, .home-stats { grid-template-columns: 1fr; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─────────────────────────────────────────── -->
+<header id="topbar">
+  <div class="site-title">musaib<span>.</span>notebook</div>
+  <nav>
+    <button class="nav-btn active" data-tab="home">Home</button>
+    <button class="nav-btn" data-tab="notebook">Notebooks</button>
+    <button class="nav-btn" data-tab="resources">Resources</button>
+    <button class="nav-btn" data-tab="about">About</button>
+  </nav>
+</header>
+
+<div id="app">
+
+  <!-- ─── HOME TAB ─────────────────────────────────────── -->
+  <div class="tab-panel active" id="tab-home">
+    <div class="home-hero">
+      <div class="home-title">A public <span>second brain</span></div>
+      <div class="home-tagline">
+        Notes I'm willing to share, resources I trust, and thoughts still in progress.
+        Wander freely through mathematics, optimization, poetry, and design.
+      </div>
+    </div>
+
+    <div class="home-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-notes">0</div>
+        <div class="stat-label">Notes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-tags">0</div>
+        <div class="stat-label">Tags</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-resources">0</div>
+        <div class="stat-label">Resources</div>
+      </div>
+    </div>
+
+    <div class="home-grid">
+      <div>
+        <div class="home-section-title"><i data-lucide="clock"></i> Recently Opened</div>
+        <div class="recent-notes-list" id="recent-opened-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div>
+        <div class="home-section-title"><i data-lucide="sparkles"></i> Latest Note</div>
+        <div class="recent-notes-list" id="latest-note-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── NOTEBOOK TAB ─────────────────────────────────── -->
+  <div class="tab-panel" id="tab-notebook">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div id="search-wrap">
+        <input type="text" id="search-input" placeholder="Search notes…" autocomplete="off" />
+      </div>
+      <div class="sidebar-label">Folders</div>
+      <div id="note-list"></div>
+    </aside>
+
+    <!-- Main content -->
+    <main id="note-main">
+      <div id="note-welcome">
+        <i data-lucide="leaf" class="welcome-leaf"></i>
+        <div class="welcome-title">Choose a note to begin</div>
+        <div class="welcome-body">
+          Select any note from the sidebar to read it here.<br>
+          Follow [[wikilinks]] to navigate. Check the backlinks panel for connections.
+        </div>
+      </div>
+      <div id="note-display" style="display:none">
+        <div class="note-meta" id="note-meta"></div>
+        <div id="note-content" class="note-enter"></div>
+      </div>
+    </main>
+
+    <!-- Backlink panel -->
+    <aside id="backlink-panel">
+      <div class="backlink-header" id="backlink-header">
+        <span>Backlinks</span>
+        <i data-lucide="chevron-right" class="collapse-icon"></i>
+      </div>
+      <div id="backlink-list">
+        <div class="no-backlinks">Open a note to see its backlinks</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ─── RESOURCES TAB ────────────────────────────────── -->
+  <div class="tab-panel" id="tab-resources">
+    <div class="section-header">Resources</div>
+    <div class="section-sub">Things I keep returning to</div>
+
+    <div class="resource-categories" id="resource-cats"></div>
+    <div class="resources-grid" id="resources-grid"></div>
+  </div>
+
+  <!-- ─── ABOUT TAB ────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-about">
+    <div class="about-eyebrow">Student · Maker · Reader</div>
+    <div class="about-name">
+      Musaib<em>Mir.</em>
+    </div>
+
+    <p class="about-body">
+      I'm a student at <strong>IIT Kharagpur</strong> in the Department of Industrial & Systems Engineering —
+      which means I spend my days thinking about optimization, uncertainty, and systems that work.
+    </p>
+    <p class="about-body">
+      Outside coursework: I write <strong>Urdu-Hindi spoken word poetry</strong>, obsess over
+      cinema (Tarkovsky, Wong Kar-Wai, the quiet ones), and build small useful software.
+      I'm part of <strong>TFPS</strong>, the campus photography club, where I work on editorial and design.
+    </p>
+    <p class="about-body">
+      This notebook is my public second brain — notes I'm willing to share, resources I trust,
+      and thoughts still in progress. Wander freely.
+    </p>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">What I'm interested in</div>
+    <ul class="interest-list">
+      <li><i data-lucide="ruler"></i> Operations Research & Optimization</li>
+      <li><i data-lucide="film"></i> Cinema & Visual Aesthetics</li>
+      <li><i data-lucide="brain"></i> Machine Learning & Statistics</li>
+      <li><i data-lucide="feather"></i> Poetry — Urdu & Hindi</li>
+      <li><i data-lucide="camera"></i> Photography & Design</li>
+      <li><i data-lucide="settings"></i> Software & Automation</li>
+    </ul>
+
+    <div class="deco-line"><span>∿</span></div>
+
+    <div class="about-section-title">Find me</div>
+    <div class="connect-links">
+      <a class="connect-link" href="https://github.com/" target="_blank">GitHub</a>
+      <a class="connect-link" href="mailto:musaib@kgpian.iitkgp.ac.in">Email</a>
+      <a class="connect-link" href="https://www.linkedin.com/" target="_blank">LinkedIn</a>
+    </div>
+
+    <div class="about-divider" style="margin-top: 48px;"></div>
+    <p class="about-body" style="font-size: 0.85rem; color: var(--fog);">
+      Built with plain HTML/CSS/JS. Hosted on GitHub Pages.<br>
+      Notes written in Markdown, rendered client-side. Last updated 2026.
+    </p>
+  </div>
+
+</div>
+
+<!-- Popover for preview -->
+<div id="link-preview" class="link-preview-popover"></div>
+
+<!-- Vault data -->
+<script src="vault.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   App logic
+═══════════════════════════════════════════════════════════ */
+
+const vault = window.VAULT;
+let currentNote = null;
+let activeCategory = 'All';
+
+/* ── Helpers ─────────────────────────────────────────────── */
+
+function slugify(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function noteById(id) {
+  return vault.notes.find(n => n.id === id);
+}
+
+function noteByTitle(title) {
+  const q = title.toLowerCase().trim();
+  return vault.notes.find(n => {
+    if (n.title.toLowerCase() === q) return true;
+    if (n.aliases && n.aliases.some(a => a.toLowerCase() === q)) return true;
+    return false;
+  });
+}
+
+function getBacklinks(noteId) {
+  const note = noteById(noteId);
+  if (!note) return [];
+  const targetTitle = note.title.toLowerCase();
+  
+  return vault.notes.filter(n => {
+    if (n.id === noteId) return false;
+    
+    // Regex to match any [[TargetNote...]]
+    const wikilinkRegex = /\[\[([^\]]+)\]\]/g;
+    let match;
+    while ((match = wikilinkRegex.exec(n.content)) !== null) {
+      let contentInside = match[1];
+      let target = contentInside.split('|')[0].split('#')[0].trim().toLowerCase();
+      if (target === targetTitle) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
+function getExcerpt(content, targetTitle) {
+  const targetLower = targetTitle.toLowerCase();
+  const wikilinkRegex = /\[\[([^\]]+)\]\]/g;
+  let match;
+  while ((match = wikilinkRegex.exec(content)) !== null) {
+    let contentInside = match[1];
+    let target = contentInside.split('|')[0].split('#')[0].trim().toLowerCase();
+    if (target === targetLower) {
+      const idx = match.index;
+      const start = Math.max(0, idx - 60);
+      const end = Math.min(content.length, idx + match[0].length + 80);
+      return content.slice(start, end).replace(/\n/g, ' ').replace(/#+\s/g, '').trim();
+    }
+  }
+  return content.slice(0, 140).replace(/\n/g, ' ').replace(/#+\s/g, '').trim();
+}
+
+/* ── Callout Processing ──────────────────────────────────── */
+
+function processCallouts(html) {
+  // Finds blockquotes that start with [!type]
+  return html.replace(/<blockquote>\s*<p>\[!(\w+)\]\s*(.*?)(<\/p>([\s\S]*?))?<\/blockquote>/gi, (match, type, titleLine, pEnd, restContent) => {
+    const typeLower = type.toLowerCase();
+    let icon = 'info';
+    if (typeLower === 'tip') icon = 'lightbulb';
+    else if (typeLower === 'important' || typeLower === 'warning') icon = 'alert-triangle';
+    else if (typeLower === 'caution') icon = 'octagon-alert';
+    else if (typeLower === 'abstract') icon = 'file-text';
+    
+    const title = titleLine.trim() || type.charAt(0).toUpperCase() + type.slice(1);
+    const contentHtml = (restContent || '').trim();
+    return `
+      <div class="callout" data-callout="${typeLower}">
+        <div class="callout-title"><i data-lucide="${icon}"></i> ${title}</div>
+        <div class="callout-content">${contentHtml}</div>
+      </div>
+    `;
+  });
+}
+
+/* ── Wikilink rendering ──────────────────────────────────── */
+
+function renderMarkdownWithWikilinks(raw) {
+  // ── Step 1: Stash math so marked.js never touches it ──────
+  // We pull out $$...$$, $...$, \[...\], \(...\) and replace
+  // them with placeholder tokens, restore after parsing.
+  const mathStash = [];
+  let stashIdx = 0;
+
+  function stash(str) {
+    const token = `\x02MATH${stashIdx++}\x03`;
+    mathStash.push({ token, str });
+    return token;
+  }
+
+  let src = raw;
+
+  // Block math: $$...$$ (may be multiline)
+  src = src.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) =>
+    stash(`<span class="math-block" data-math="${encodeURIComponent('$$' + expr + '$$')}"></span>`)
+  );
+
+  // Block math: \[...\]
+  src = src.replace(/\\\[([\s\S]+?)\\\]/g, (_, expr) =>
+    stash(`<span class="math-block" data-math="${encodeURIComponent('\\[' + expr + '\\]')}"></span>`)
+  );
+
+  // Inline math: $...$  (not $$ – already consumed above)
+  src = src.replace(/\$([^\$\n]+?)\$/g, (_, expr) =>
+    stash(`<span class="math-inline" data-math="${encodeURIComponent('$' + expr + '$')}"></span>`)
+  );
+
+  // Inline math: \(...\)
+  src = src.replace(/\\\((.+?)\\\)/g, (_, expr) =>
+    stash(`<span class="math-inline" data-math="${encodeURIComponent('\\(' + expr + '\\)')}"></span>`)
+  );
+
+  // ── Step 2: Replace [[wikilinks]] ─────────────────────────
+  src = src.replace(/\[\[([^\]]+)\]\]/g, (_, content) => {
+    let target = content;
+    let displayText = content;
+
+    if (content.includes('|')) {
+      const parts = content.split('|');
+      target = parts[0].trim();
+      displayText = parts[1].trim();
+    }
+
+    let noteTitle = target;
+    let hash = '';
+    if (target.includes('#')) {
+      const parts = target.split('#');
+      noteTitle = parts[0].trim();
+      hash = parts[1].trim();
+    }
+
+    if (!noteTitle && currentNote) noteTitle = currentNote.title;
+
+    const found = noteByTitle(noteTitle);
+    const cls = found ? 'wikilink' : 'wikilink missing';
+    const id = found ? found.id : '';
+
+    return `<span class="${cls}" data-noteid="${id}" data-hash="${hash}" data-title="${noteTitle}">${displayText}</span>`;
+  });
+
+  // ── Step 3: Parse markdown ─────────────────────────────────
+  let html = marked.parse(src);
+
+  // ── Step 4: Process Obsidian callouts ─────────────────────
+  html = processCallouts(html);
+
+  // ── Step 5: Restore math placeholders ─────────────────────
+  mathStash.forEach(({ token, str }) => {
+    html = html.replace(token, str);
+    // marked may have wrapped token in <p>; unwrap block math from <p>
+    html = html.replace(new RegExp(`<p>\\s*${token}\\s*<\\/p>`, 'g'), str);
+  });
+
+  return html;
+}
+
+/* ── Render KaTeX on the DOM node ────────────────────────── */
+
+function renderMath(container) {
+  // KaTeX loads with defer — wait for it
+  if (typeof katex === 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => renderMath(container), { once: true });
+    // Retry after short delay as a fallback
+    setTimeout(() => { if (typeof katex !== 'undefined') renderMath(container); }, 800);
+    return;
+  }
+
+  // Render placeholders left by renderMarkdownWithWikilinks
+  container.querySelectorAll('.math-inline, .math-block').forEach(el => {
+    const raw = decodeURIComponent(el.dataset.math || '');
+    if (!raw) return;
+    try {
+      const isBlock = el.classList.contains('math-block');
+      const wrapper = document.createElement(isBlock ? 'div' : 'span');
+      wrapper.className = isBlock ? 'katex-display-wrap' : 'katex-inline-wrap';
+      katex.render(raw.replace(/^\$\$|\$\$$/g, '').replace(/^\$|\$$/g, '').replace(/^\\\[|\\\]$/g, '').replace(/^\\\(|\\\)$/g, ''), wrapper, {
+        displayMode: isBlock,
+        throwOnError: false,
+        output: 'html',
+      });
+      el.replaceWith(wrapper);
+    } catch (e) {
+      // fallback: show raw source
+      el.textContent = decodeURIComponent(el.dataset.math || '');
+    }
+  });
+
+  // Also run auto-render for anything that slipped through
+  if (window.renderMathInElement) {
+    renderMathInElement(container, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+      ],
+      throwOnError: false,
+    });
+  }
+}
+
+/* ── Hover Preview Popover ───────────────────────────────── */
+
+const previewEl = document.getElementById('link-preview');
+let previewTimeout;
+
+function setupHoverPreviews() {
+  document.querySelectorAll('.wikilink:not(.missing), .backlink-entry').forEach(el => {
+    el.addEventListener('mouseenter', (e) => {
+      clearTimeout(previewTimeout);
+      const noteId = el.dataset.noteid || el.dataset.id;
+      if (!noteId) return;
+      const note = noteById(noteId);
+      if (!note) return;
+      
+      const contentExcerpt = getExcerpt(note.content, 'this string will definitely not match so we just get the start');
+      
+      previewEl.innerHTML = `
+        <div class="preview-title">${note.title}</div>
+        <div class="preview-content">${contentExcerpt}</div>
+      `;
+      
+      let x = e.clientX + 15;
+      let y = e.clientY + 20;
+      
+      if (x + 340 > window.innerWidth) x = window.innerWidth - 360;
+      if (y + 240 > window.innerHeight) y = e.clientY - 260;
+      
+      previewEl.style.left = x + 'px';
+      previewEl.style.top = y + 'px';
+      previewEl.classList.add('show');
+    });
+    
+    el.addEventListener('mouseleave', () => {
+      previewTimeout = setTimeout(() => {
+        previewEl.classList.remove('show');
+      }, 100);
+    });
+  });
+}
+
+/* ── Render note ─────────────────────────────────────────── */
+
+function openNote(id, hash = '') {
+  const note = noteById(id);
+  if (!note) return;
+  currentNote = note;
+
+  // Sidebar highlight
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+
+  // Show display, hide welcome
+  document.getElementById('note-welcome').style.display = 'none';
+  const display = document.getElementById('note-display');
+  display.style.display = 'block';
+
+  // Meta
+  const meta = document.getElementById('note-meta');
+  const tagsHtml = note.tags.map(t => `<span class="note-meta-tag">#${t}</span>`).join('');
+  meta.innerHTML = `
+    <span>${note.date || ''}</span>
+    <span class="note-meta-tags">${tagsHtml}</span>
+  `;
+
+  // Content
+  const content = document.getElementById('note-content');
+  content.className = 'note-enter';
+  content.innerHTML = renderMarkdownWithWikilinks(note.content);
+
+  // Render math (KaTeX) — wait a tick so DOM is painted
+  requestAnimationFrame(() => renderMath(content));
+
+  // Re-trigger animation
+  void content.offsetWidth;
+  content.className = 'note-enter';
+
+  // Attach wikilink handlers
+  content.querySelectorAll('.wikilink:not(.missing)').forEach(el => {
+    el.addEventListener('click', () => {
+      openNote(el.dataset.noteid, el.dataset.hash);
+    });
+  });
+
+  // Backlinks & Previews
+  renderBacklinks(id);
+  setupHoverPreviews();
+
+  // Trigger Lucide parsing
+  lucide.createIcons();
+
+  // Scroll to hash if present
+  if (hash) {
+    setTimeout(() => {
+      const decodedHash = decodeURIComponent(hash).toLowerCase().trim();
+      const headers = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      let targetHeader = null;
+      for (const h of headers) {
+        const text = h.textContent.toLowerCase().trim();
+        if (text === decodedHash || text.includes(decodedHash) || decodedHash.includes(text)) {
+          targetHeader = h;
+          break;
+        }
+      }
+      if (targetHeader) {
+        targetHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Update URL hash
+  history.pushState(null, '', `#note=${id}${hash ? '&hash=' + encodeURIComponent(hash) : ''}`);
+  
+  // Track recently opened
+  let recent = JSON.parse(localStorage.getItem('recentNotes') || '[]');
+  recent = recent.filter(rId => rId !== id);
+  recent.unshift(id);
+  if (recent.length > 5) recent.pop();
+  localStorage.setItem('recentNotes', JSON.stringify(recent));
+  
+  buildHomepage();
+}
+
+function renderBacklinks(noteId) {
+  const links = getBacklinks(noteId);
+  const container = document.getElementById('backlink-list');
+
+  if (links.length === 0) {
+    container.innerHTML = '<div class="no-backlinks">No backlinks yet</div>';
+    return;
+  }
+
+  const targetTitle = noteById(noteId).title;
+  container.innerHTML = links.map(n => {
+    const excerpt = getExcerpt(n.content, targetTitle);
+    return `
+      <div class="backlink-entry" data-id="${n.id}">
+        <div class="backlink-title">${n.title}</div>
+        <div class="backlink-excerpt">…${excerpt}…</div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.backlink-entry').forEach(el => {
+    el.addEventListener('click', () => openNote(el.dataset.id));
+  });
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+
+function buildSidebar(notes) {
+  const list = document.getElementById('note-list');
+  list.innerHTML = '';
+
+  // Group by folder
+  const folders = {};
+  const rootNotes = [];
+  
+  notes.forEach(note => {
+    if (note.folder && note.folder !== "Notes") {
+      if (!folders[note.folder]) folders[note.folder] = [];
+      folders[note.folder].push(note);
+    } else {
+      rootNotes.push(note);
+    }
+  });
+
+  const generateItemHtml = (note, isRoot) => {
+    let iconName = 'file-text';
+    const tags = note.tags.map(t => t.toLowerCase());
+    if (tags.some(t => t.includes('cinema'))) iconName = 'film';
+    else if (tags.some(t => t.includes('ml') || t.includes('machine-learning') || t.includes('deep-learning'))) iconName = 'brain';
+    else if (tags.some(t => t.includes('poetry'))) iconName = 'feather';
+    else if (tags.some(t => t.includes('photography') || t.includes('design'))) iconName = 'camera';
+    else if (tags.some(t => t.includes('or') || t.includes('optimization') || t.includes('gradient-descent'))) iconName = 'ruler';
+    else if (tags.some(t => t.includes('meta'))) iconName = 'leaf';
+
+    return `
+      <div class="sidebar-item ${isRoot ? 'root-item' : ''}" data-id="${note.id}">
+        <span class="sidebar-item-icon"><i data-lucide="${iconName}"></i></span>${note.title}
+      </div>
+    `;
+  };
+
+  // Render folders
+  Object.keys(folders).sort().forEach(folderName => {
+    const group = document.createElement('div');
+    group.className = 'folder-group';
+    
+    // Check local storage for open state
+    const isOpen = localStorage.getItem('folder_' + folderName) !== 'closed';
+    
+    group.innerHTML = `
+      <div class="folder-header ${isOpen ? 'open' : ''}" data-folder="${folderName}">
+        <span>${folderName}</span>
+        <i data-lucide="chevron-right" class="chevron"></i>
+      </div>
+      <div class="folder-notes ${isOpen ? 'open' : ''}">
+        ${folders[folderName].map(n => generateItemHtml(n, false)).join('')}
+      </div>
+    `;
+    list.appendChild(group);
+  });
+
+  // Render root notes
+  if (rootNotes.length > 0) {
+    const rootGroup = document.createElement('div');
+    rootGroup.style.marginTop = "8px";
+    rootGroup.innerHTML = rootNotes.map(n => generateItemHtml(n, true)).join('');
+    list.appendChild(rootGroup);
+  }
+
+  // Attach event listeners
+  list.querySelectorAll('.folder-header').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('open');
+      const notesDiv = el.nextElementSibling;
+      notesDiv.classList.toggle('open');
+      localStorage.setItem('folder_' + el.dataset.folder, el.classList.contains('open') ? 'open' : 'closed');
+    });
+  });
+
+  list.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => {
+      switchTab('notebook');
+      openNote(el.dataset.id);
+    });
+  });
+
+  lucide.createIcons();
+}
+
+/* ── Search ──────────────────────────────────────────────── */
+
+document.getElementById('search-input').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  const filtered = q
+    ? vault.notes.filter(n =>
+        n.title.toLowerCase().includes(q) ||
+        n.content.toLowerCase().includes(q) ||
+        n.tags.some(t => t.includes(q))
+      )
+    : vault.notes;
+  buildSidebar(filtered);
+
+  if (currentNote) {
+    const el = document.querySelector(`.sidebar-item[data-id="${currentNote.id}"]`);
+    if (el) el.classList.add('active');
+  }
+});
+
+/* ── Home Page ───────────────────────────────────────────── */
+
+function buildHomepage() {
+  document.getElementById('stat-notes').innerText = vault.notes.length;
+  const allTags = new Set();
+  vault.notes.forEach(n => n.tags.forEach(t => allTags.add(t)));
+  document.getElementById('stat-tags').innerText = allTags.size;
+  document.getElementById('stat-resources').innerText = vault.resources.length;
+
+  const recentIds = JSON.parse(localStorage.getItem('recentNotes') || '[]');
+  const recentList = document.getElementById('recent-opened-list');
+  
+  if (recentIds.length === 0) {
+    recentList.innerHTML = `<div class="welcome-body" style="padding:10px">No notes opened yet.</div>`;
+  } else {
+    recentList.innerHTML = recentIds.map(id => {
+      const n = noteById(id);
+      if (!n) return '';
+      return `
+        <div class="recent-note-card" onclick="switchTab('notebook'); openNote('${n.id}')">
+          <div class="recent-note-title">${n.title}</div>
+          <div class="recent-note-meta">${n.folder || 'Notes'}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Latest Note (by date)
+  const latestList = document.getElementById('latest-note-list');
+  const sortedByDate = [...vault.notes].sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (sortedByDate.length > 0) {
+    const latest = sortedByDate[0];
+    latestList.innerHTML = `
+      <div class="recent-note-card" onclick="switchTab('notebook'); openNote('${latest.id}')">
+        <div>
+          <div class="recent-note-title">${latest.title}</div>
+          <div class="recent-note-meta">${latest.date || ''}</div>
+        </div>
+        <i data-lucide="arrow-right" style="width:16px; color:var(--amber)"></i>
+      </div>
+    `;
+  }
+  lucide.createIcons();
+}
+
+/* ── Resources ───────────────────────────────────────────── */
+
+function buildResources(category) {
+  activeCategory = category;
+  const resources = category === 'All'
+    ? vault.resources
+    : vault.resources.filter(r => r.category === category);
+
+  const grid = document.getElementById('resources-grid');
+  grid.innerHTML = resources.map((r, i) => `
+    <div class="resource-card" style="animation-delay:${i * 40}ms">
+      <div class="resource-category-label">${r.category}</div>
+      <div class="resource-title">${r.title}</div>
+      <div class="resource-note">${r.note}</div>
+      <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">
+        Visit resource <i data-lucide="arrow-up-right" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-left: 2px;"></i>
+      </a>
+      <div class="resource-tags">
+        ${r.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === category);
+  });
+}
+
+function buildCategoryFilters() {
+  const cats = ['All', ...new Set(vault.resources.map(r => r.category))];
+  const container = document.getElementById('resource-cats');
+  container.innerHTML = cats.map(c => `
+    <button class="cat-btn ${c === 'All' ? 'active' : ''}" data-cat="${c}">${c}</button>
+  `).join('');
+  container.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => buildResources(btn.dataset.cat));
+  });
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  if (tab === 'home') buildHomepage();
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+/* ── Backlink toggle ─────────────────────────────────────── */
+
+document.getElementById('backlink-header').addEventListener('click', () => {
+  document.getElementById('backlink-panel').classList.toggle('collapsed');
+});
+
+/* ── URL hash routing ────────────────────────────────────── */
+
+function handleHash() {
+  const hash = location.hash;
+  if (hash.startsWith('#note=')) {
+    const query = hash.slice(6);
+    const parts = query.split('&hash=');
+    const id = parts[0];
+    const headerHash = parts[1] ? decodeURIComponent(parts[1]) : '';
+    switchTab('notebook');
+    openNote(id, headerHash);
+  }
+}
+
+/* ── Init ────────────────────────────────────────────────── */
+
+buildSidebar(vault.notes);
+buildCategoryFilters();
+buildResources('All');
+buildHomepage();
+handleHash();
+lucide.createIcons();
+
+window.addEventListener('hashchange', handleHash);
+
+// Default to Home if no hash
+if (!location.hash) {
+  switchTab('home');
+}
+</script>
+</body>
+</html>

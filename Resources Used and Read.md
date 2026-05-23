@@ -1,0 +1,13 @@
+[CS231n Deep Learning for Computer Vision](https://cs231n.github.io/optimization-2/)
+[The spelled-out intro to neural networks and backpropagation: building micrograd](https://www.youtube.com/watch?v=VMj-3S1tku0)
+[[1802.01528] The Matrix Calculus You Need For Deep Learning](https://arxiv.org/abs/1802.01528)
+[CS231n Deep Learning for Computer Vision](https://cs231n.github.io/neural-networks-3/)
+[Why Momentum Really Works](https://distill.pub/2017/momentum/)
+[[1412.6980] Adam: A Method for Stochastic Optimization](https://arxiv.org/abs/1412.6980)
+Dropout (Srivastava, Hinton, Krizhevsky, Sutskever & Salakhutdinov, 2014 — JMLR 15:1929–1958)
+Gal & Ghahramani, _Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning_, ICML 2016.
+Layer Normalization : Ba, Kiros & Hinton, 2016 — arXiv:1607.06450)
+Batch Normalization : Ioffe & Szegedy, ICML 2015 (arXiv:1502.03167)
+[Deep Learning, NLP, and Representations - colah's blog](https://colah.github.io/posts/2014-07-NLP-RNNs-Representations/)
+[The Illustrated Word2vec – Jay Alammar – Visualizing machine learning one concept at a time.](https://jalammar.github.io/illustrated-word2vec/)
+[The Unreasonable Effectiveness of Recurrent Neural Networks](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)

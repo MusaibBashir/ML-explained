@@ -1,0 +1,249 @@
+{
+  "main": {
+    "id": "d8e7070dd9f886da",
+    "type": "split",
+    "children": [
+      {
+        "id": "096c89fcce7db8ff",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "04da0280ef4ce803",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Optimizers/Training Diagnostics and Optimizers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Training Diagnostics and Optimizers"
+            }
+          },
+          {
+            "id": "15ee2f43056b39a2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "future.md",
+                "mode": "preview",
+                "source": true
+              },
+              "icon": "lucide-file",
+              "title": "future"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6e49a51f0b173f81",
+    "type": "split",
+    "children": [
+      {
+        "id": "509cd41d2ca4006c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c64f808b91ad3e87",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "da84850e5b476bc4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "51ec48576201cef1",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 295.5
+  },
+  "right": {
+    "id": "f5d7a6cafa9405a1",
+    "type": "split",
+    "children": [
+      {
+        "id": "764e7bd4e023a945",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "76960e9a930960a1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Optimizers/Training Diagnostics and Optimizers.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Training Diagnostics and Optimizers"
+            }
+          },
+          {
+            "id": "748dbee8e3c59cc9",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Optimizers/Training Diagnostics and Optimizers.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Training Diagnostics and Optimizers"
+            }
+          },
+          {
+            "id": "85fdde92b15f98c7",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "011f4ef72356daef",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "13f086ebe5f2c73d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Table Of Contents.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Table Of Contents"
+            }
+          },
+          {
+            "id": "3fdee529c99fa2eb",
+            "type": "leaf",
+            "state": {
+              "type": "file-properties",
+              "state": {
+                "file": "Optimizers/Training Diagnostics and Optimizers.md"
+              },
+              "icon": "lucide-info",
+              "title": "File properties for Training Diagnostics and Optimizers"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "04da0280ef4ce803",
+  "lastOpenFiles": [
+    "future.md",
+    "Resources Used and Read.md",
+    "Optimizers/Training Diagnostics and Optimizers.md",
+    "Optimizers/Momentum.md",
+    "Optimizers/Map of Content - Paths.md",
+    "Optimizers/Gradient Descent Overview.md",
+    "Normalization/Dropout -Bayesian.md",
+    "Optimizers/Adam.md",
+    "Normalization/Dropout.md",
+    "Normalization/Layer Normalization.md",
+    "Table Of Contents.md",
+    "Written Notes/BN_written_notes.md",
+    "RNNS/Karpathy RNNs.md",
+    "Written Notes/Dropout written notes.md",
+    "Written Notes/LN_written_notes.md",
+    "RNNS",
+    "NLP/word2vec.ipynb",
+    "NLP",
+    "New folder",
+    "Optimizers/vault.js",
+    "Optimizers/build_vault.py",
+    "Optimizers/index.html",
+    "Optimizers/New Text Document.txt",
+    "Residual Networks.md",
+    "Normalization/Batch Normalization.md",
+    "Batch Regularization.md",
+    "Written Notes",
+    "DL Math Fundamentals.md",
+    "Normalization",
+    "Untitled.canvas",
+    "2026-05-18.md",
+    "β, λᵢ], [−αβ, 1−αλᵢ.md",
+    "Welcome.md"
+  ]
+}
